@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำนวณงานและกำลังทางฟิสิกส์</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .card {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+        }
+
+        #workSteps p, #powerSteps p {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+        }
+
+        #results p {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="text-center mb-4">คำนวณงานและกำลังทางฟิสิกส์</h1>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">ข้อมูลการคำนวณ</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="calculatorForm">
+                            <div class="mb-3">
+                                <label for="force" class="form-label">แรง (F) นิวตัน</label>
+                                <input type="number" class="form-control" id="force" required step="any">
+                            </div>
+                            <div class="mb-3">
+                                <label for="distance" class="form-label">ระยะทาง (d) เมตร</label>
+                                <input type="number" class="form-control" id="distance" required step="any">
+                            </div>
+                            <div class="mb-3">
+                                <label for="time" class="form-label">เวลา (t) วินาที</label>
+                                <input type="number" class="form-control" id="time" required step="any">
+                            </div>
+                            <button type="submit" class="btn btn-primary">คำนวณ</button>
+                            <button type="reset" class="btn btn-secondary">ล้างข้อมูล</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">สูตรที่ใช้</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>งาน (Work): W = F × d</p>
+                        <p>กำลัง (Power): P = W ÷ t</p>
+                        <hr>
+                        <p>โดยที่:</p>
+                        <ul>
+                            <li>W คือ งาน (จูล, J)</li>
+                            <li>F คือ แรง (นิวตัน, N)</li>
+                            <li>d คือ ระยะทาง (เมตร, m)</li>
+                            <li>P คือ กำลัง (วัตต์, W)</li>
+                            <li>t คือ เวลา (วินาที, s)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">ผลลัพธ์และวิธีทำ</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="solution" class="d-none">
+                            <h6>วิธีทำ:</h6>
+                            <div id="workSteps" class="mb-3"></div>
+                            <div id="powerSteps" class="mb-3"></div>
+                            <h6>ผลลัพธ์:</h6>
+                            <div id="results" class="alert alert-info"></div>
+                        </div>
+                        <div id="initialMessage" class="text-center text-muted">
+                            กรุณาป้อนข้อมูลและกดปุ่มคำนวณ
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        
+        document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get input values
+            const force = parseFloat(document.getElementById('force').value);
+            const distance = parseFloat(document.getElementById('distance').value);
+            const time = parseFloat(document.getElementById('time').value);
+
+            // Validate inputs
+            if (force <= 0 || distance <= 0 || time <= 0) {
+                alert('กรุณาป้อนค่าที่มากกว่า 0');
+                return;
+            }
+
+            // Calculate work and power
+            const work = force * distance;
+            const power = work / time;
+
+            // Show solution div and hide initial message
+            document.getElementById('solution').classList.remove('d-none');
+            document.getElementById('initialMessage').classList.add('d-none');
+
+            // Display work calculation steps
+            document.getElementById('workSteps').innerHTML = `
+                <p>1. คำนวณงาน (W)</p>
+                <p>W = F × d</p>
+                <p>W = ${force} N × ${distance} m</p>
+                <p>W = ${work.toFixed(2)} จูล (J)</p>
+            `;
+
+            // Display power calculation steps
+            document.getElementById('powerSteps').innerHTML = `
+                <p>2. คำนวณกำลัง (P)</p>
+                <p>P = W ÷ t</p>
+                <p>P = ${work.toFixed(2)} J ÷ ${time} s</p>
+                <p>P = ${power.toFixed(2)} วัตต์ (W)</p>
+            `;
+
+            // Display final results
+            document.getElementById('results').innerHTML = `
+                <p>งาน (W) = ${work.toFixed(2)} จูล (J)</p>
+                <p>กำลัง (P) = ${power.toFixed(2)} วัตต์ (W)</p>
+            `;
+        });
+
+        // Reset form and hide results
+        document.getElementById('calculatorForm').addEventListener('reset', function() {
+            document.getElementById('solution').classList.add('d-none');
+            document.getElementById('initialMessage').classList.remove('d-none');
+        });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="th" data-bs-theme="dark">
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คำนวณงานและกำลังทางฟิสิกส์</title>
+    <!-- ใช้ Bootstrap CDN โดยตรง -->
+    <!-- ใช้ Bootstrap CDN มาตรฐาน -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        /* รวม CSS เข้ามาในไฟล์เดียว */
+        body {
+            background-color: #112c47;
+            color: #fff;
+        }    
+        .card {
+            background-color: #000000;
+            box-shadow: 0 2px 4px rgba(212, 12, 12, 0.1);
+        }
+        .card-header {
+            background-color: #000000;
+            border-bottom: 1px solid #000000;
+        }
+        .form-control {
+            background-color: #343a40;
+            border-color: #454d55;
+            color: #fff;
+        }
+        .form-control:focus {
+            border-color: var(--bs-primary);
+            box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+            background-color: #343a40;
+            border-color: #0d6efd;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .alert-info {
+            background-color: #343a40;
+            border-color: #454d55;
+            color: #fff;
+        }
+        #workSteps p, #powerSteps p {
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+}
+#results p {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem; /* Added missing semicolon */
+    }
+}
+
+   
+
+
+    
